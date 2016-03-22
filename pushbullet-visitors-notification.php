@@ -10,6 +10,7 @@
 
 namespace Mtantawy\PushbulletVisitorsNotification;
 
+require_once 'src/Tools.php';
 require_once 'src/GeoIP.php';
 require_once 'src/PushbulletNotification.php';
 
