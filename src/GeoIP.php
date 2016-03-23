@@ -8,6 +8,10 @@ class GeoIP
     
     public function getGeoData($ip)
     {
+        if (empty($ip)) {
+            return false;
+        }
+
         $base_url = 'http://www.geoplugin.net/json.gp?ip=';
         $response = $this->getURL($base_url.$ip);
 
