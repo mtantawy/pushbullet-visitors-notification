@@ -2,7 +2,7 @@
 /*
   Plugin Name: Pushbullet Visitors Notification
   Description: Send Pushbullet notification whenever a user visits the blog, notification includes data like IP and GeoIP info using an API by geoplugin.net .
-  Version: 1.1.4
+  Version: 1.0.0
   Author: Mahmoud Tantawy
   Author URI: https://mtantawy.com
   License: GPLv2 or later
@@ -14,7 +14,10 @@ namespace Mtantawy\PushbulletVisitorsNotification;
 add_action('wp_loaded', function () {
     if (!is_admin()) { // Only target the front end
         $access_token = get_option('mtantawy_pushbullet_access_token');
-        $ip = getVisitorIp();
+        $ip = getVisitorIp() ?: false;
+        if (false === $ip) {
+            return false;
+        }
         $path = plugin_dir_path(__FILE__);
 
         exec('cd "'.$path.'"; php cli.php '.$access_token.' '.$ip.' >> output');
@@ -23,12 +26,16 @@ add_action('wp_loaded', function () {
 
 function getVisitorIp()
 {
-    $ip=$_SERVER['REMOTE_ADDR'];
-    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {               // check ip from share internet
-        $ip=$_SERVER['HTTP_CLIENT_IP'];
-    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {   // to check ip is pass from proxy
-        $ip=$_SERVER['HTTP_X_FORWARDED_FOR'];
+    if (false !== strpos(strtolower($_SERVER['HTTP_USER_AGENT']), 'jetpack')) {
+        return false;
     }
-    $ips = explode(",", $ip);
+    $ip = $_SERVER['REMOTE_ADDR'];
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {               // check ip from share internet
+        $ip = $_SERVER['HTTP_CLIENT_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {   // to check ip is pass from proxy
+        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+    }
+    $ips = explode(',', $ip);
+
     return $ips[0];
 }
