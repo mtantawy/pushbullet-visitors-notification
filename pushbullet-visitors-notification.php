@@ -13,7 +13,7 @@ namespace Mtantawy\PushbulletVisitorsNotification;
 // if u want to load a function only in the front end
 add_action('wp_loaded', function () {
     if (!is_admin()) { // Only target the front end
-        if (checkUserAgent()) {
+        if (!checkUserAgent()) {
             return false;
         }
         $ip = getVisitorIp() ?: false;
@@ -22,7 +22,7 @@ add_action('wp_loaded', function () {
         }
         $path = plugin_dir_path(__FILE__);
         $access_token = get_option('mtantawy_pushbullet_access_token');
-        
+
         exec('cd "'.$path.'"; php cli.php '.$access_token.' '.$ip.' >> output');
     }
 });
